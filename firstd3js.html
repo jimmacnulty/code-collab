@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="https://d3js.org/d3.v4.min.js"> </script>
+</head>
+<body>
+    <div id = "svgcontainer"></div>
+    <script>
+        var width = 800;
+        var height = 300;
+        //Create SVG element
+        var svg = d3.select("#svgcontainer")
+          .append("svg")
+          .attr("width", width)
+          .attr("height", height);
+       //Append circle 
+        svg.append("circle")
+          .attr("cx", 200)
+          .attr("cy", 50)
+          .attr("r", 20)
+          .attr("fill", "green");
+
+        svg.append("ellipse")
+            .attr("cx", 500)
+            .attr("cy", 210)
+            .attr("rx", 35)
+            .attr("ry", 10);
+
+        d3.selectAll("circle")
+            .transition()
+            .attr("cy", function(d,i){
+                return 100*(i+1)
+                })
+
+            .transition()
+            .attr("cx", function(d,i){
+                return 400*(i+1)
+            })
+            .attr("cy", function(d,i){
+                return 200*(i+1)
+                })   
+            .transition()
+            .attr("cx", function(d,i){
+                return 500*(i+1)
+            }) 
+
+            .transition()
+            .attr("cy", function(d,i){
+                return 220*(i+1)
+                })
+            .attr("opacity", 0)      
+    </script>
+</body>
+</html>
