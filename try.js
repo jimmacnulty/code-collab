@@ -1,17 +1,29 @@
 function Box() {
+    var id = 0;
+    var canvas;
 
-    var canvas = document.getElementById('canvas');
-    var ctx = canvas.getContext('2d');
+    this.idnew = function (_x) {
+        id = _x.idnum;
+        x = _x.xcan;
+        y = _x.ycan;
 
-    var turn = 1;
-    var w = canvas.width;
-    var h = canvas.height;
+        canvas = document.createElement('canvas');
+        window.ctx = canvas.getContext('2d');
+        canvas.setAttribute('id', 'mycanvas' + id);
+        canvas.setAttribute('width', '330');
+        canvas.setAttribute('height', '330');
+        canvas.style.position = 'relative';
+        canvas.style.left = x + 'px';
+        canvas.style.top = y + 'px';
+        document.body.appendChild(canvas);
+    }
 
     var xstr = 0;
     var ystr = 0;
     var rw = 150;
     var rh = 100;
     var rstr = 10;
+    var event;
 
     this.init = function (_obj) {
 
@@ -20,95 +32,137 @@ function Box() {
         rstr = _obj.rstr ? _obj.rstr : rstr;
         rw = _obj.rw ? _obj.rw : rw;
         rh = _obj.rh ? _obj.rh : rh;
+        xcan = _obj.xcan;
+        ycan = _obj.ycan;
+        // id = _obj.id ? _obj.id : null;
+        event = _obj.event;
+
+        ctx.fillStyle = 'grey';
 
         ctx.fillRect(xstr, ystr, rw, rh);
-
-        canvas.addEventListener('mouseup', play); 
+        canvas.addEventListener('mousedown', onClick);
 
     }
 
-    function play(evt) {
-        var pos = mousePoint(canvas, evt)
-        console.log(pos);
+    function onClick(evt) {
+        //console.log(pos);
+        event(id);
+    }
+
+    this.crossFunction = function (x, y) {
+        console.log("cross", x, y);
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+
+        ctx.moveTo((x * 110) + 10, (y * 110) + 10);
+        ctx.lineTo((x * 110) + 90, (y * 110) + 90);
+        ctx.stroke();
+
+        ctx.moveTo((x * 110) + 90, (y * 110) + 10);
+        ctx.lineTo((x * 110) + 10, (y * 110) + 90);
+        ctx.stroke();
+
+        ctx.stroke();
+
+    }
+
+    this.myFunction = function (x, y) {
+
+        console.log("circle", x, y)
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.arc((x * 110) + 50, (y * 110) + 50, 40, 0, 2 * Math.PI);
+        ctx.stroke();
+
+    }
+
+}
+
+function Movement() {
+
+    var turn = 1;
+    var x = 1;
+    var y = 1;
+    var idnum;
+    //var id;
+
+    var w = 100;
+    var h = 100;
+
+    var z = new Box();
+
+    this.start = function (_obj) {
+
+        idnum = _obj.id;
+        x1 = _obj.xcan;
+        y1 = _obj.ycan;
+
+        z.idnew({
+            idnum: idnum,
+            xcan: x1,
+            ycan: y1
+        });
+
+        var k = 1;
+        for (var i = 0; i < 3; i++) {
+            for (var j = 0; j < 3; j++) {
+                z.init({
+                    xstr: x + i * 110,
+                    ystr: y + j * 110,
+                    rw: w,
+                    rh: h,
+                    event: clicked
+
+
+                    //id: k
+                })
+            }
+        }
+        k++;
+    }
+
+
+    function clicked(event, id) {
         if (turn === 1) {
             turn = 2;
         } else {
             turn = 1;
         }
 
-        var mousepoint = mousePoint(event);
+        var mousepoint = mousePoint(event, id);
+        console.log(mousepoint);
         piece(mousepoint);
     }
 
-    function mousePoint(canvas, event) {
 
-        var rect = canvas.getBoundingClientRect();
+    function mousePoint(id) {
 
-        x = event.clientX - rect.left;
-        y = event.clientY - rect.top;
+        var a = this['mycanvas' + id];
+        console.log(a)
+        var rect = this['mycanvas' + id].getBoundingClientRect();
+        x1 = event.clientX - rect.left;
+        y1 = event.clientY - rect.top;
         return {
-            x1: Math.floor((x / 50)),
-            y1: Math.floor((y / 50))
+            x: Math.floor((x1 / 100)),
+            y: Math.floor((y1 / 100))
         };
 
     }
 
     function piece(mouse) {
-        var x;
-        var y;
-        for (var x = 0; x < 3; x++) {
-            for (var y = 0; y < 3; y++) {
-                x = x * w;
-                y = y * h;
-                if (mouse.x >= x && mouse.x <= x + w && mouse.y >= y && mouse.y <= y + h) {
-                    clear(x, y);
-                    if (player === 1) {
-                        crossFunction(x, y);
-                    } else {
-                        myFunction(x, y);
-                    }
-                }
-            }
+
+        if (turn === 1) {
+            z.crossFunction(mouse.x, mouse.y);
+            //console.log(mouse.x, mouse.y)
+        } else {
+            z.myFunction(mouse.x, mouse.y);
+            //console.log(mouse.x, mouse.y)
         }
-    }
 
-    function clear(x, y) {
-        context.fillStyle = "#fff";
-        context.fillRect(x, y, w, h);
     }
 
 
-    // var crossFunction = function (x, y) {
 
-    //     context.beginPath();
-    //     context.moveTo((x * 50) + 10, (y * 50) + 10);
-    //     context.lineTo((x * 50) + 30, (y * 50) + 30);
-    //     context.stroke();
-
-    //     context.moveTo((x * 50) + 30, (y * 50) + 10);
-    //     context.lineTo((x * 50) + 10, (y * 50) + 30);
-    //     context.stroke();
-
-    //     change();
-
-    // }
-    // var myFunction = function (cordinates) {
-
-    //     var j = 0;
-    //     for (var i = 0; i < 4; i++) {
-    //         context.beginPath();
-    //         context.arc((cordinates[i][j] * 50 + 30), (cordinates[i][j + 1] * 50 + 30), 10, 0, Math.PI * 2);
-    //         context.stroke();
-    //     }
-    //     j++;
-    //     flag = 0;
-    //     change();
-
-    // }
-
-    // function start() {
-    //     change();
-    // }
 
     // function checkwin(move) {
     //     console.log("checkwin")
@@ -117,24 +171,6 @@ function Box() {
     //         check(3, 6, 9, move) || check(1, 5, 9, move) || check(3, 5, 7, move)) {
     //         console.log('Game Won');
     //         document.write(move + " has won")
-    //     }
-
-    // }
-
-    // function turn() {
-
-    //     if (document.turn == "X") {
-
-    //         flag = 1;
-    //         document.turn = "O";
-
-    //     } else if (document.turn == "O") {
-
-    //         document.turn = "X";
-    //     }
-
-    //     if (checkwin(document.turn)) {
-    //         document.innerText(document.turn + "has won")
     //     }
 
     // }
@@ -152,32 +188,6 @@ function Box() {
     //     console.log(y)
     //     return y;
     // }
-}
-
-function Movement() {
-
-    var x = 0;
-    var y = 0;
-    var w = 100;
-    var h = 100;
-
-    this.start = function () {
-        var k = 1;
-        for (var i = 0; i < 3; i++) {
-            for (var j = 0; j < 3; j++) {
-
-                this['b' + k] = new Box();
-                this['b' + k].init({
-                    xstr: x + i * 110,
-                    ystr: y + j * 110,
-                    rw: w,
-                    rh: h
-                })
-                k++;
-            }
-        }
-    }
-
 
 
 }
@@ -185,8 +195,24 @@ function Movement() {
 window.onload = function () {
 
     var t = new Movement();
-    t.start({});
+    var t1 = new Movement();
+    t.start({
+        xcan: 10,
+        ycan: 10,
+        id: 0
+    });
+    t1.start({
+        xcan: 100,
+        ycan: 100,
+        id: 1
+    });
 
 
+    // var t1 = new Movement();
+    // t1.start({
+    //     xcan: 400,
+    //     ycan: 400,
+    //     id: 2
+    // });
 
 }
